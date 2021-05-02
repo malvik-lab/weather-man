@@ -1,6 +1,6 @@
 <?php
 
-require '../../vendor/autoload.php';
+require 'autoload.php';
 
 $weatherMan = new MalvikLab\WeatherMan\WeatherMan(new GuzzleHttp\Client());
 
