@@ -31,6 +31,7 @@ Available types:
 - WeatherMan\Util\Constant::SIX_DAYS
 - WeatherMan\Util\Constant::SEVEN_DAYS
 */
+
 $data = $weatherMan->get($locationId, $type);
 ```
 
