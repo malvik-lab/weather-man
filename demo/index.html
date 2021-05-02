@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Weather Man Demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  </head>
+  <body class="pt-5 pb-3">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <input id="location" class="form-control form-control-lg" type="text" autocomplete="off" placeholder="Località">
+        </div>
+      </div>
+
+      <div id="loading" class="row d-none">
+        <div class="col-12 text-center">
+          <div class="spinner-border m-5" role="status">
+            <span class="sr-only"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="rendered"></div>
+    </div>
+
+    <script id="template" type="x-tmpl-mustache">
+    <div class="row mt-5">
+      <div class="col-md-12">
+        <h1>{{ locationInfo.name }}</h1>
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-md-12">
+        <ul class="nav nav-tabs mt-5" role="tablist">
+          {{ #items }}
+            <li data-h="" class="nav-item" role="presentation">
+              <a class="nav-link" id="{{ type }}-tab" data-toggle="tab" href="#content-{{ type }}" role="tab" aria-controls="{{ type }}" aria-selected="false"> {{ label }}</a>
+            </li>
+          {{ /items }}
+        </ul>
+    
+        <div class="tab-content">
+          {{ #items }}
+            <div class="tab-pane fade" id="content-{{ type }}" role="tabpanel" aria-labelledby="{{ type }}-tab">
+              <div class="row mt-3">
+                {{ #data.dayParts }}
+                  <div class="col-md-3">
+                    <div class="card">
+                      <div class="card-body text-center">
+                        <h5 class="card-title">{{ _title }}</h5>
+                          <div><img src="{{ _iconUrl }}">{{ _windText }}</div>
+                          <div><small class="text-muted">{{ _iconText }}</small></div>
+                      </div>
+                    </div>
+                  </div>
+                {{ /data.dayParts }}
+              </div>
+
+              {{ #data._weatherReport.description }}
+                <div class="row mt-3">
+                  <div class="col-md-12">
+                    <div class="card">
+                      <div class="card-body">{{ data._weatherReport.description }}</div>
+                    </div>
+                  </div>
+                </div>
+              {{ /data._weatherReport.description }}
+
+              <div class="mt-3">
+                <ul class="list-group">
+                  {{ #data.hours }}
+                    <li data-hour="{{ _hour }}" class="list-group-item">
+                      <div class="row">
+                        <div class="col-md-2">
+                          <h2><span class="badge badge-secondary">{{ _hour }}:00</span></h2>
+                        </div>
+                        <div class="col-md-3 text-center">
+                          <div><img src="{{ _weatherIconUrl }}"></div>
+                          <div><small class="text-muted">{{ _weatherIconText }}</small></div>
+                        </div>
+                        <div class="col-md-4">
+                          <img src="{{ _windDirectionIconUrl }}" class="mr-2">{{ _windDirectionIconText }}
+                        </div>
+                        <div class="col-md-3">
+                          Temperatura: {{ temperature }}°<br>
+                          Umidità: {{ umidity }}%<br>
+                          Vento: {{ _windMinimumIntensity }}-{{ _windMaximunIntensity }} Km/h
+                        </div>
+                      </div>
+                    </li>
+                  {{ /data.hours }}
+                </ul>
+              </div>
+            </div>
+          {{ /items }}
+        </div>
+      </div>
+    </div>
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js"></script>
+    <script src="https://unpkg.com/mustache@latest"></script>
+    <script>
+    $('#location').autoComplete({
+        resolverSettings: {
+            url: 'app/search-location.php' 
+        },
+    });
+
+    $('#location').on('autocomplete.select', function(evt, item){
+      getData(item.value)
+    });
+
+    function getData(idLocation){
+      $('#rendered').html('')
+      $('#location').attr('disabled', true)
+      $('#loading').removeClass('d-none').addClass('d-block')
+
+      $.ajax({
+        type: 'GET',
+        url: 'app/get-data.php?idLocation=' + idLocation,
+        dataType: 'json',
+
+        success: function(data){
+          $('#location').val('')
+          $('#location').attr('disabled', false);
+          $('#loading').removeClass('d-block').addClass('d-none')
+
+          let template = $('#template').html()
+          Mustache.parse(template)
+          let rendered = Mustache.render(template, data)
+          $('#rendered').html(rendered)
+
+          let currentH = (new Date()).getHours()
+          let itemH
+          if ( currentH > 0 ){
+            $('#content-oggi ul.list-group li.list-group-item').each(function(){
+              itemH = $(this).data('hour')
+              if ( itemH < currentH && !$(this).is(':last-child') ){
+                $(this).remove()
+              }
+            })
+          }
+
+          $('ul.nav-tabs li.nav-item:first a.nav-link').click()
+        },
+
+        error: function(data){
+          $('#location').attr('disabled', false);
+          $('#loading').removeClass('d-block').addClass('d-none')
+
+          alert(data.responseText)
+        }
+      });
+    }
+    </script>
+  </body>
+</html>
