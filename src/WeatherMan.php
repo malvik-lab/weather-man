@@ -7,7 +7,7 @@ use Cocur\Slugify\Slugify;
 
 class WeatherMan
  {
-    const VERSION = '1.0.0';
+    const VERSION = '1.0.1';
     const DEFAULT_LOCATIONS_VERSION = '2021-01-17';
 
     private $client;
