@@ -13,8 +13,12 @@ $ composer require malvik-lab/weather-man
 
 require 'vendor/autoload.php';
 
-$client = new GuzzleHttp\Client();
-$weatherMan = new WeatherMan\WeatherMan($client);
+use MalvikLab\WeatherMan\WeatherMan;
+use MalvikLab\WeatherMan\Util\Constant;
+use GuzzleHttp\Client;
+
+$client = new Client();
+$weatherMan = new WeatherMan($client);
 
 ## First, search location id
 $locations = $weatherMan->searchLocation('Roma');
@@ -22,16 +26,18 @@ $locations = $weatherMan->searchLocation('Roma');
 ## Second, get data
 /*
 Available types:
-- WeatherMan\Util\Constant::TODAY
-- WeatherMan\Util\Constant::TOMORROW
-- WeatherMan\Util\Constant::TWO_DAYS
-- WeatherMan\Util\Constant::THREE_DAYS
-- WeatherMan\Util\Constant::FOUR_DAYS
-- WeatherMan\Util\Constant::FIVE_DAYS
-- WeatherMan\Util\Constant::SIX_DAYS
-- WeatherMan\Util\Constant::SEVEN_DAYS
+- Constant::TODAY
+- Constant::TOMORROW
+- Constant::TWO_DAYS
+- Constant::THREE_DAYS
+- Constant::FOUR_DAYS
+- Constant::FIVE_DAYS
+- Constant::SIX_DAYS
+- Constant::SEVEN_DAYS
 */
 
+$locationId = '0058091';
+$type = Constant::TODAY;
 $data = $weatherMan->get($locationId, $type);
 ```
 

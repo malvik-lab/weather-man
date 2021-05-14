@@ -1,6 +1,9 @@
 <?php declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
+use MalvikLab\WeatherMan\WeatherMan;
+use MalvikLab\WeatherMan\Util\Constant;
+use GuzzleHttp\Client;
 
 /**
  * vendor/bin/phpunit tests-integration --do-not-cache-result
@@ -11,7 +14,7 @@ final class WeatherManTest extends TestCase {
 
     protected function setUp(): void
     {
-        $this->obj = new WeatherMan\WeatherMan(new GuzzleHttp\Client());
+        $this->obj = new WeatherMan(new Client());
     }
 
     public function testRandomGet(): void
@@ -24,14 +27,14 @@ final class WeatherManTest extends TestCase {
         $this->assertTrue(count($search) > 0);
 
         $types = [
-            \WeatherMan\Util\Constant::TODAY,
-            \WeatherMan\Util\Constant::TOMORROW,
-            \WeatherMan\Util\Constant::TWO_DAYS,
-            \WeatherMan\Util\Constant::THREE_DAYS,
-            \WeatherMan\Util\Constant::FOUR_DAYS,
-            \WeatherMan\Util\Constant::FIVE_DAYS,
-            \WeatherMan\Util\Constant::SIX_DAYS,
-            \WeatherMan\Util\Constant::SEVEN_DAYS,
+            Constant::TODAY,
+            Constant::TOMORROW,
+            Constant::TWO_DAYS,
+            Constant::THREE_DAYS,
+            Constant::FOUR_DAYS,
+            Constant::FIVE_DAYS,
+            Constant::SIX_DAYS,
+            Constant::SEVEN_DAYS,
         ];
 
         foreach ( $types as $type )

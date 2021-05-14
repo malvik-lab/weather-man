@@ -14,7 +14,7 @@ trait SearchLocation {
         {
             foreach ( $this->locations as $location )
             {
-                if ( strtolower(trim($location['name'])) === $s )
+                if ( strtolower(trim($location['name'])) === strtolower($s) )
                 {
                     $return[] = $location;
                 }
